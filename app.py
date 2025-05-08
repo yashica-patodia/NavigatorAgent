@@ -9,8 +9,8 @@ from flask import send_from_directory
 app = Flask(__name__)
 CORS(app)
 
-# Initialize the navigator agent
-navigator = NavigatorAgent()
+# # Initialize the navigator agent
+# navigator = NavigatorAgent()
 
 @app.route('/api/search', methods=['POST'])
 def search():
@@ -48,5 +48,6 @@ if __name__ == '__main__':
     scraper.scrape_all_content()
     print("Creating vector embeddings...")
     vectorizer = Vectorizer()
+    navigator = NavigatorAgent()
     vectorizer.create_embeddings()
     app.run(host='0.0.0.0', port=port, debug=True)
