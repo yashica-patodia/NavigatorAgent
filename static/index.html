@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeedToScale Navigator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #3a7bd5;
+        }
+        .search-container {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3a7bd5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .sources {
+            margin-top: 20px;
+        }
+        .source-item {
+            margin: 5px 0;
+        }
+        .source-link {
+            color: #3a7bd5;
+            text-decoration: none;
+        }
+        .source-link:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>SeedToScale Navigator</h1>
+    <p>Ask questions about startup growth, funding, or product development</p>
+    
+    <div class="search-container">
+        <input type="text" id="query-input" placeholder="Ask your question...">
+        <button id="search-button">Search</button>
+    </div>
+    
+    <div id="loading" class="loading" style="display: none;">
+        Searching SeedToScale knowledge base...
+    </div>
+    
+    <div id="result-container" class="result-container" style="display: none;">
+        <div id="answer"></div>
+        <div id="sources" class="sources">
+            <h3>Sources:</h3>
+            <div id="source-list"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const queryInput = document.getElementById('query-input');
+            const searchButton = document.getElementById('search-button');
+            const resultContainer = document.getElementById('result-container');
+            const answerElement = document.getElementById('answer');
+            const sourceList = document.getElementById('source-list');
+            const loadingElement = document.getElementById('loading');
+            
+            // Function to handle search
+            const handleSearch = async () => {
+                const query = queryInput.value.trim();
+                if (!query) return;
+                
+                // Show loading, hide results
+                loadingElement.style.display = 'block';
+                resultContainer.style.display = 'none';
+                
+                try {
+                    const response = await fetch('/api/answer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ query }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    // Display the answer
+                    answerElement.innerHTML = data.answer.replace(/\n/g, '<br>');
+                    
+                    // Display sources
+                    sourceList.innerHTML = '';
+                    if (data.sources && data.sources.length > 0) {
+                        data.sources.forEach(source => {
+                            const sourceItem = document.createElement('div');
+                            sourceItem.className = 'source-item';
+                            sourceItem.innerHTML = `
+                                <a href="${source.url}" target="_blank" class="source-link">
+                                    ${source.title}
+                                </a>
+                            `;
+                            sourceList.appendChild(sourceItem);
+                        });
+                    } else {
+                        sourceList.innerHTML = '<p>No specific sources found.</p>';
+                    }
+                    
+                    // Show results, hide loading
+                    resultContainer.style.display = 'block';
+                    loadingElement.style.display = 'none';
+                } catch (error) {
+                    console.error('Error:', error);
+                    answerElement.innerHTML = 'An error occurred while processing your request.';
+                    sourceList.innerHTML = '';
+                    resultContainer.style.display = 'block';
+                    loadingElement.style.display = 'none';
+                }
+            };
+            
+            // Add event listeners
+            searchButton.addEventListener('click', handleSearch);
+            queryInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    handleSearch();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

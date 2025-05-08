@@ -1,0 +1,25 @@
+# Exclude environment and version control files
+.env
+.git
+.gitignore
+.DS_Store
+
+# Exclude Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.ipynb_checkpoints
+
+# Exclude data files (comment out if you want to include these in the image)
+# data/
+# vectors/
+
+# Exclude development and documentation files
+README.md
+*.md
+.vscode/
